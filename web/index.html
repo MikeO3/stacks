@@ -50,7 +50,11 @@
   .orde button[aria-pressed="true"] { background: rgba(255,255,255,.18); font-weight: 600; }
   /* Onderaan ruimte voor de speelcapsule (18 + 56 + lucht): de laatste rug kan er altijd onder vandaan scrollen. Op iPad en iPhone
      deed de safe area dat al; op een desktop was die 0 (forum, Firefox op Linux, 7 nov 2026). */
-  #stapel { display: flex; flex-direction: column; gap: 1px; padding-bottom: calc(env(safe-area-inset-bottom) + 92px); }
+  /* Afgeschermd (#2, Android/Vivaldi, 15 nov 2026): het filter openen verandert de kop, het toetsenbord de hoogte van het
+     beeld — en de browser rekende dan stijl en layout van alle ~9.000 ruggen opnieuw. Met layout- en stijlcontainment blijft
+     de stapel buiten schot zolang zijn breedte gelijk blijft. */
+  #stapel { display: flex; flex-direction: column; gap: 1px; padding-bottom: calc(env(safe-area-inset-bottom) + 92px);
+    contain: layout style; }
   .rug { display: flex; align-items: center; gap: 12px; height: var(--h, var(--dikte)); padding: 0 var(--rand-r) 0 var(--rand);
     background-color: var(--bg, #383838);
     background-image: linear-gradient(to bottom, rgba(255,255,255,.10), transparent 50%, rgba(0,0,0,.18));
@@ -705,7 +709,12 @@ document.addEventListener('keydown', e => { if (e.key === 'Escape') sluit(); });
 // ---- het filter ----
 const filterVak = document.querySelector('.filter'), filterVeld = document.getElementById('filterVeld'), filterKnop = document.getElementById('filterKnop');
 filterKnop.innerHTML = svg('zoek'); filterVak.querySelector('.glas').innerHTML = svg('zoek'); filterVak.querySelector('.wis').innerHTML = svg('wis');
-function openFilter() { filterVak.hidden = false; filterVeld.focus(); filterVeld.select(); }
+// Eerst tekenen, dan de focus zonder te scrollen (#2): focus() in dezelfde beurt dwong een layout van de hele pagina af, en op
+// Android schoof hij ook nog naar het veld. select() alleen als er iets te selecteren is.
+function openFilter() {
+  filterVak.hidden = false;
+  requestAnimationFrame(() => { filterVeld.focus({ preventScroll: true }); if (filterVeld.value) filterVeld.select(); });
+}
 function sluitFilter() { filterVeld.value = ''; filterTekst = ''; filterVak.hidden = true; teken(); filterVeld.blur(); }
 filterKnop.addEventListener('click', openFilter);
 filterVak.querySelector('.wis').addEventListener('click', sluitFilter);

@@ -3,6 +3,7 @@
 #   docker/bouw.sh            → alleen bouwen (laden kan niet bij twee platforms; dit controleert dat het bouwt)
 #   docker/bouw.sh lokaal     → alleen voor dit platform, geladen als stacks:proef (om meteen te proberen)
 #   docker/bouw.sh push       → bouwen en naar Docker Hub (renebouwmeester/stacks:<versie> en :latest)
+#   docker/bouw.sh beta       → bouwen en naar Docker Hub, alleen :<versie> (een testimage; :latest blijft staan)
 # De push in een Terminal op Dylan zelf, niet via ssh (7 nov 2026, 0.3.1): Docker Desktop bewaart de Docker Hub-login in de
 # sleutelhanger, en een ssh-sessie mag daar niet bij ('the current session does not allow user interaction').
 set -euo pipefail
@@ -13,6 +14,7 @@ docker buildx inspect stacks-bouwer >/dev/null 2>&1 || docker buildx create --na
 docker buildx use stacks-bouwer
 case "${1:-}" in
   lokaal) docker buildx build --load -t stacks:proef . ;;
+  beta)   docker buildx build --platform linux/amd64,linux/arm64 -t "$IMAGE:$VERSIE" --push . ;;
   push)   docker buildx build --platform linux/amd64,linux/arm64 -t "$IMAGE:$VERSIE" -t "$IMAGE:latest" --push . ;;
   *)      docker buildx build --platform linux/amd64,linux/arm64 -t "$IMAGE:$VERSIE" . ;;
 esac
