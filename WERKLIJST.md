@@ -50,4 +50,5 @@ Bovenaan wat eerst moet; afgevinkt gaat naar het logboek in NOTITIES.md (README.
 - [x] AC/DC bleef niet heel op de rug ("AC & DC") — opgelost 2ac209f, op Dylan, nog niet in Docker.
 - [x] README: sectie Logs (c97c78a).
 - [x] Koppeling steviger (hoes + kale titel) en een logregel voor wat niet koppelt (8 nov). Was: reactie van de forumgebruiker afwachten: lengte en formaat op sommige ruggen leeg (zijn AC/DC zonder, Highway to Hell en Back in Black met). Status van Richer data + `docker logs` gevraagd; vermoeden: de koppeling titel+artiest mislukt.
-- [ ] Daarna versie ophogen en het image pushen (`docker/bouw.sh`, in Terminal op Dylan).
+- [x] AC/DC, de koppeling en de README in 0.3.2 (17 nov), met de Android-zoekfix van 0.3.2-beta.1 (#2) en lib/intern.js uit Deep Roon 0.5.11.
+- [ ] Het image pushen: in Terminal op Dylan `cd ~/Basso/stacks-bouw && docker/bouw.sh push` (René).
