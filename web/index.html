@@ -51,8 +51,8 @@
   /* Onderaan ruimte voor de speelcapsule (18 + 56 + lucht): de laatste rug kan er altijd onder vandaan scrollen. Op iPad en iPhone
      deed de safe area dat al; op een desktop was die 0 (forum, Firefox op Linux, 7 nov 2026). */
   /* Afgeschermd (#2, Android/Vivaldi, 15 nov 2026): het filter openen verandert de kop, het toetsenbord de hoogte van het
-     beeld — en de browser rekende dan stijl en layout van alle ~9.000 ruggen opnieuw. Met layout- en stijlcontainment blijft
-     de stapel buiten schot zolang zijn breedte gelijk blijft. */
+     beeld. Met layout- en stijlcontainment blijft de stapel buiten schot zolang zijn breedte gelijk blijft. De eigenlijke
+     oorzaak bleek --kop-h op <html> (22 nov, zie kopHoogte): dat bouwde alle ruggen opnieuw op, containment of niet. */
   #stapel { display: flex; flex-direction: column; gap: 1px; padding-bottom: calc(env(safe-area-inset-bottom) + 92px);
     contain: layout style; }
   .rug { display: flex; align-items: center; gap: 12px; height: var(--h, var(--dikte)); padding: 0 var(--rand-r) 0 var(--rand);
@@ -782,7 +782,10 @@ let lesOpen = window.innerWidth > 900, lesGezicht = 'np', wachtrijNu = [], seekB
 try { const v = localStorage.getItem('stacks.lessenaar'); if (v) lesOpen = v === 'open'; } catch {}
 
 // Openen en dichtklappen: het paneel glijdt over de pagina; de stapel blijft zoals hij is.
-const kopHoogte = () => document.documentElement.style.setProperty('--kop-h', document.querySelector('header').offsetHeight + 'px');
+// Op het paneel zelf, niet op <html> (#2, 22 nov 2026): een eigen variabele op de root die verandert, liet Chromium stijl en
+// layoutboom van alle ruggen opnieuw opbouwen (~9.000 bij een grote bibliotheek) — en de kop verandert van hoogte zodra het
+// filter opengaat. Op een Android-tablet bevroor daarmee de tik op Search.
+const kopHoogte = () => les.style.setProperty('--kop-h', document.querySelector('header').offsetHeight + 'px');
 new ResizeObserver(kopHoogte).observe(document.querySelector('header'));
 function zetLessenaar(open, bewaar = true) {
   kopHoogte();
